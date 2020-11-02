@@ -2,10 +2,6 @@ package com.thelumierguy.starfield.utils
 
 const val ALPHA = 0.05F
 
-/**
- * Low Pass filter which smoothes out the data
- * We will only be using the
- */
 fun lowPass(
     input: FloatArray,
     output: FloatArray

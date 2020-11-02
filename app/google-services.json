@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "29290980124",
+    "firebase_url": "https://starfields-f0fb0.firebaseio.com",
+    "project_id": "starfields-f0fb0",
+    "storage_bucket": "starfields-f0fb0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29290980124:android:936aa4572a9ec8031290d9",
+        "android_client_info": {
+          "package_name": "com.thelumierguy.starfield"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29290980124-bo5vavfdvn22f7ecqp7q3du0g8ihnjfu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARA6gR5FkFLxsHcMsci_KN4fFlgq-IaSk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29290980124-bo5vavfdvn22f7ecqp7q3du0g8ihnjfu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

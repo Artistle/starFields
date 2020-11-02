@@ -7,7 +7,6 @@ import com.thelumierguy.starfield.views.BlinkingImage
 import com.thelumierguy.starfield.views.LogoView
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 fun MainActivity.observeScreenStates() {
     mainViewModel.observeScreenState().observe(this, Observer {
         star_field?.processScreenState(it)

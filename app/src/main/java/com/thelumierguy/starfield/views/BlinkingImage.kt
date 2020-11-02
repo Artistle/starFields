@@ -11,9 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-class BlinkingImage @JvmOverloads constructor(
-    context: Context,
-    attributeSet: AttributeSet? = null,
+class BlinkingImage @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null,
     defStyle: Int = 0
 ) : AppCompatImageView(context, attributeSet, defStyle) {
 

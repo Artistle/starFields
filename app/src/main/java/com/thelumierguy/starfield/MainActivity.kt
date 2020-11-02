@@ -3,16 +3,21 @@ package com.thelumierguy.starfield
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.Scene
 import androidx.transition.Transition
 import androidx.transition.TransitionInflater
 import androidx.transition.TransitionManager
+import com.google.firebase.FirebaseApp
 import com.thelumierguy.starfield.utils.ScreenStates
 import com.thelumierguy.starfield.views.SpaceShipView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -34,10 +39,11 @@ class MainActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
 
     private var accelerometerManager: AccelerometerManager? = null
+    private lateinit var loadData: RemoteConfigViewModel
 
-    val mainViewModel by lazy {
-        ViewModelProvider(this)[MainViewModel::class.java]
-    }
+    //view models
+    val mainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
+    val remoteConfigViewModel by lazy { ViewModelProvider(this)[RemoteConfigViewModel::class.java] }
 
     val appInitScene: Scene by lazy { createScene(R.layout.scene_app_init) }
     val gameMenuScene: Scene by lazy { createScene(R.layout.scene_menu) }
@@ -57,10 +63,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         goFullScreen()
         setContentView(R.layout.activity_main)
+        remoteConfigViewModel.loadRemoteConfig(this)
+        var timer = Timer(object:Runnable{
+            override fun run() {
+                var web_url = remoteConfigViewModel.urlLiveData.value
+                if(web_url == null || web_url == "" || web_url=="Fetching config…"){
+
+                }else{
+                    updateUrl(web_url)
+                }
+            }
+
+        },500,true)
+        timer.startTimer()
+        timer.stopTimer()
         addTouchHandler()
         observeScreenStates()
         addAccelerometerListener()
         initMenu()
+    }
+    private fun updateUrl(url:String){
+
     }
 
     private fun startMusic() {
@@ -85,14 +108,11 @@ class MainActivity : AppCompatActivity() {
             lifecycle.addObserver(it)
         }
     }
-
-
     private fun addTouchHandler() {
         root_view.setOnClickListener {
             handleTouch()
         }
     }
-
     private fun handleTouch() {
         when (mainViewModel.getCurrentState()) {
             ScreenStates.START_GAME -> {
@@ -106,7 +126,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun initMenu() {
         lifecycleScope.launch(Dispatchers.Main) {
             pushUIState(ScreenStates.APP_INIT)
@@ -124,8 +143,8 @@ class MainActivity : AppCompatActivity() {
             window.setDecorFitsSystemWindows(false)
         } else {
             window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
-                    // Set the content to appear under the system bars so that the
-                    // content doesn't resize when the system bars hide and show.
+                    // Настройте отображение содержимого под системными панелями, чтобы
+                    // содержимое не изменялось, когда системные полосы скрываются и отображаются.
                     or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
