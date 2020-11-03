@@ -1,4 +1,4 @@
-package com.thelumierguy.starfield.utils
+package com.contestPM.competition.utils
 
 const val ALPHA = 0.05F
 

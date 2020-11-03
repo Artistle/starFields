@@ -1,25 +1,28 @@
-package com.thelumierguy.starfield
+package com.contestPM.competition
 
+import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.Scene
 import androidx.transition.Transition
 import androidx.transition.TransitionInflater
 import androidx.transition.TransitionManager
-import com.google.firebase.FirebaseApp
-import com.thelumierguy.starfield.utils.ScreenStates
-import com.thelumierguy.starfield.views.SpaceShipView
+import com.contestPM.competition.utils.ScreenStates
+import com.contestPM.competition.utils.Timer
+import com.contestPM.competition.views.SpaceShipView
+import com.contestPM.competition.views.WebViewActivity
+import com.facebook.FacebookSdk
+import com.facebook.applinks.AppLinkData
+import com.thelumierguy.starfield.DeepLinkViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.scene_game_start.*
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
-
+    private var isCheck = 0 //счётчик для таймера
     private val transitionManager: TransitionManager by lazy {
         TransitionManager().apply {
             setTransition(appInitScene, gameMenuScene, transition)
@@ -35,15 +38,28 @@ class MainActivity : AppCompatActivity() {
             setTransition(startGameScene, gameMenuScene, transition)
         }
     }
-
     private var mediaPlayer: MediaPlayer? = null
-
     private var accelerometerManager: AccelerometerManager? = null
     private lateinit var loadData: RemoteConfigViewModel
 
     //view models
     val mainViewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
     val remoteConfigViewModel by lazy { ViewModelProvider(this)[RemoteConfigViewModel::class.java] }
+
+    //таймер
+    var timer = Timer(object : Runnable {
+        override fun run() {
+            var web_url = remoteConfigViewModel.urlLiveData.value
+            if (web_url == null || web_url == "" || web_url == "Fetching config…") {
+                isCheck++
+                isCheckedTimer(isCheck)
+            } else {
+                updateUrl(web_url)
+            }
+        }
+    }, 500, true)
+
+
 
     val appInitScene: Scene by lazy { createScene(R.layout.scene_app_init) }
     val gameMenuScene: Scene by lazy { createScene(R.layout.scene_menu) }
@@ -53,37 +69,41 @@ class MainActivity : AppCompatActivity() {
         TransitionInflater.from(this)
             .inflateTransition(R.transition.screen_transitions)
     }
-
-
     fun transitionToScene(scene: Scene) {
         transitionManager.transitionTo(scene)
+    }
+    private fun isCheckedTimer(isCheck:Int){
+        Log.i("TIMER","$isCheck" + " timer stop")
+        if(isCheck > 30){
+            timer.stopTimer()
+
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         goFullScreen()
         setContentView(R.layout.activity_main)
+
+        var r = DeepLinkViewModel()
+        r.requestDeepLink(this)
+
+
+
         remoteConfigViewModel.loadRemoteConfig(this)
-        var timer = Timer(object:Runnable{
-            override fun run() {
-                var web_url = remoteConfigViewModel.urlLiveData.value
-                if(web_url == null || web_url == "" || web_url=="Fetching config…"){
-
-                }else{
-                    updateUrl(web_url)
-                }
-            }
-
-        },500,true)
         timer.startTimer()
-        timer.stopTimer()
+        Log.i("TIMER","$isCheck" + " timer start")
         addTouchHandler()
         observeScreenStates()
         addAccelerometerListener()
         initMenu()
     }
     private fun updateUrl(url:String){
-
+        var intent = Intent(this, WebViewActivity::class.java)
+        intent.putExtra("URL",url)
+        timer.stopTimer()
+        Log.i("TIMER", " timer stop")
+        startActivity(intent)
     }
 
     private fun startMusic() {

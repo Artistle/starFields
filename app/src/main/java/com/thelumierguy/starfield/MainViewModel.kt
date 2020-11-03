@@ -1,9 +1,9 @@
-package com.thelumierguy.starfield
+package com.contestPM.competition
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.thelumierguy.starfield.utils.ScreenStates
+import com.contestPM.competition.utils.ScreenStates
 
 class MainViewModel : ViewModel() {
 

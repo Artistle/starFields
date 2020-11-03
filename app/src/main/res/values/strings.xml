@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Starscape</string>
+    <string name="app_name">PMcontest</string>
+    <string name="facebook_app_id">678648799505960</string>
+    <string name="fb_login_protocol_scheme">fb678648799505960</string>
 </resources>

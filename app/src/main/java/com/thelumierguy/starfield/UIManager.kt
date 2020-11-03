@@ -1,10 +1,10 @@
-package com.thelumierguy.starfield
+package com.contestPM.competition
 
 import android.widget.ImageView
 import androidx.lifecycle.Observer
-import com.thelumierguy.starfield.utils.ScreenStates
-import com.thelumierguy.starfield.views.BlinkingImage
-import com.thelumierguy.starfield.views.LogoView
+import com.contestPM.competition.utils.ScreenStates
+import com.contestPM.competition.views.BlinkingImage
+import com.contestPM.competition.views.LogoView
 import kotlinx.android.synthetic.main.activity_main.*
 
 fun MainActivity.observeScreenStates() {

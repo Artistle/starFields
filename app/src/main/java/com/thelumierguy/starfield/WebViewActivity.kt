@@ -1,40 +1,45 @@
 package com.contestPM.competition.views
 
 import android.os.Bundle
+import android.util.Base64
+import android.util.Log
 import android.webkit.WebChromeClient
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.contestPM.competition.R
-import com.contestPM.competition.RemoteConfigViewModel
-import com.thelumierguy.starfield.DeepLinkViewModel
+import com.facebook.FacebookSdk
+import com.facebook.applinks.AppLinkData
 
 class WebViewActivity:AppCompatActivity() {
 
-
     private lateinit var view:WebView
-
-    val remoteConfigViewModel by lazy { ViewModelProvider(this)[DeepLinkViewModel::class.java] }
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        remoteConfigViewModel.requestDeepLink(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.web_view)
 
-        var t = remoteConfigViewModel.liveDataDeepLink.value
+        FacebookSdk.setAutoInitEnabled(true)
+        FacebookSdk.fullyInitialize()
+        AppLinkData.fetchDeferredAppLinkData(this) { appLinkData ->
+            Log.i("Deep","${appLinkData?.targetUri}")
+            Log.i("Deep","${appLinkData?.targetUri}")
+        }
+        
         var url = intent.getStringExtra("URL")
-
         val webview: WebView = findViewById<WebView>(R.id.main_web_view)
         webview.settings.setAppCacheEnabled(true)
         webview.settings.javaScriptEnabled = true
         webview.settings.domStorageEnabled = true
         webview.settings.databaseEnabled = true
 
-        webview.loadUrl(url.toString());
+        webview.loadUrl(decoderUrl(url.toString()));
         webview.setWebViewClient(object : WebViewClient(){} )
         webview.setWebChromeClient(object:  WebChromeClient() {} )
+    }
+    private fun decoderUrl(coderUrl:String):String{
+        var byteUrl = Base64.decode(coderUrl,1)
+        var mainUrl = String(byteUrl)
+        return mainUrl
     }
     override fun onBackPressed() {
         when {

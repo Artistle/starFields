@@ -1,6 +1,8 @@
-package com.thelumierguy.starfield
+package com.contestPM.competition
 
 import android.app.Activity
+import android.util.Base64
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +14,7 @@ import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 class RemoteConfigViewModel : ViewModel() {
     var remoteConfig = Firebase.remoteConfig
     var urlLiveData = MutableLiveData<String>()
+
 
     val configSettings = remoteConfigSettings {
         minimumFetchIntervalInSeconds = 500
@@ -28,8 +31,10 @@ class RemoteConfigViewModel : ViewModel() {
                 } else {}
             }
         var url = remoteConfig[LOADING_PHASE].asString()
+        Log.i("RemoteConfig","$url")
         urlLiveData.setValue(url)
     }
+
 
     companion object{
         private const val LOADING_PHASE = "web_url"

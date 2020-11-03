@@ -1,4 +1,4 @@
-package com.thelumierguy.starfield.views
+package com.contestPM.competition.views
 
 import android.content.Context
 import android.util.AttributeSet

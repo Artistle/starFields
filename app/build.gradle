@@ -11,7 +11,7 @@ android {
     buildToolsVersion "30.0.1"
 
     defaultConfig {
-        applicationId "com.thelumierguy.starfield"
+        applicationId "com.contestPM.competition"
         minSdkVersion 18
         targetSdkVersion 30
         versionCode 1
@@ -32,7 +32,6 @@ android {
         jvmTarget = '1.8'
     }
 }
-
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -48,6 +47,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0-alpha06"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.0-alpha06"
 
+    //facebook sdk
+    implementation 'com.facebook.android:facebook-android-sdk:[4,8)'
 
     //firebase
     implementation platform('com.google.firebase:firebase-bom:26.0.0')
