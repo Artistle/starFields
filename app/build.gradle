@@ -1,22 +1,42 @@
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-android-extensions'
-    id 'com.google.gms.google-services'
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
+
+
+    //apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
+    //id 'com.onesignal.androidsdk.onesignal-gradle-plugin'
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.google.gms.google-services'
+
+buildscript {
+    repositories {
+        maven { url 'https://maven.google.com' }
+        maven { url 'https://plugins.gradle.org/m2/'}
+    }
+    dependencies {
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:0.12.9'
+    }
 }
 
-android {
 
+
+
+android {
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
-
     defaultConfig {
         applicationId "com.contestPM.competition"
         minSdkVersion 18
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [
+                onesignal_app_id: '1a579fc4-1218-4c37-bf96-961d1249be3e',
+                // Project number pulled from dashboard, local value is ignored.
+                onesignal_google_project_number: 'REMOTE'
+        ]
     }
     buildTypes {
         release {
@@ -50,8 +70,14 @@ dependencies {
     //facebook sdk
     implementation 'com.facebook.android:facebook-android-sdk:[4,8)'
 
+    //one signal
+    implementation 'com.onesignal:OneSignal:3.15.4'
+
     //firebase
     implementation platform('com.google.firebase:firebase-bom:26.0.0')
     implementation 'com.google.firebase:firebase-config-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
+
+    //implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.android.support:multidex:1.0.3'
 }

@@ -20,9 +20,7 @@ import com.contestPM.competition.utils.ScreenStates
 import com.contestPM.competition.utils.Timer
 import com.contestPM.competition.views.SpaceShipView
 import com.contestPM.competition.views.WebViewActivity
-import com.facebook.FacebookSdk
-import com.facebook.applinks.AppLinkData
-import com.thelumierguy.starfield.DeepLinkViewModel
+import com.onesignal.OneSignal
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.scene_game_start.*
 import kotlinx.coroutines.Dispatchers
@@ -85,10 +83,11 @@ class MainActivity : AppCompatActivity() {
         goFullScreen()
         setContentView(R.layout.activity_main)
 
-        var r = DeepLinkViewModel()
-        r.requestDeepLink(this)
-
-
+        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
+        OneSignal.startInit(this)
+            .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+            .unsubscribeWhenNotificationsAreDisabled(true)
+            .init()
 
         remoteConfigViewModel.loadRemoteConfig(this)
         timer.startTimer()
@@ -104,6 +103,10 @@ class MainActivity : AppCompatActivity() {
         timer.stopTimer()
         Log.i("TIMER", " timer stop")
         startActivity(intent)
+    }
+
+    fun saveSettings(url:String){
+
     }
 
     private fun startMusic() {
