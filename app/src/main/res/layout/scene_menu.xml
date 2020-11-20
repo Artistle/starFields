@@ -29,7 +29,7 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView"
         app:layout_constraintWidth_percent="0.3" />
 
-    <com.contestPM.competition.views.SpaceShipView
+    <com.contestPM.competition.views.SpaceShip
         android:id="@+id/space_ship"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

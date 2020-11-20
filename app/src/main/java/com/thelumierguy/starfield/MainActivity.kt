@@ -2,8 +2,10 @@ package com.contestPM.competition
 
 import android.content.Intent
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +20,11 @@ import androidx.transition.TransitionInflater
 import androidx.transition.TransitionManager
 import com.contestPM.competition.utils.ScreenStates
 import com.contestPM.competition.utils.Timer
-import com.contestPM.competition.views.SpaceShipView
+import com.contestPM.competition.utils.UrlBuilder
+import com.contestPM.competition.views.SpaceShip
 import com.contestPM.competition.views.WebViewActivity
+import com.facebook.FacebookSdk
+import com.facebook.applinks.AppLinkData
 import com.onesignal.OneSignal
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.scene_game_start.*
@@ -35,6 +40,7 @@ class MainActivity : AppCompatActivity() {
             setTransition(gameMenuScene, startGameScene, transition)
             setTransition(startGameScene, gameMenuScene, transition)
         }
+
     }
     private var mediaPlayer: MediaPlayer? = null
     private var accelerometerManager: AccelerometerManager? = null
@@ -50,12 +56,15 @@ class MainActivity : AppCompatActivity() {
             var web_url = remoteConfigViewModel.urlLiveData.value
             if (web_url == null || web_url == "" || web_url == "Fetching config…") {
                 isCheck++
+                remoteConfigViewModel.loadRemoteConfig(this@MainActivity)
+                Log.i("TIMER","$isCheck" + " " + "$web_url" )
                 isCheckedTimer(isCheck)
             } else {
-                updateUrl(web_url)
+                //updateUrl(web_url)
+                checkUrl(web_url)
             }
         }
-    }, 500, true)
+    }, 1000, true)
 
 
 
@@ -72,9 +81,9 @@ class MainActivity : AppCompatActivity() {
     }
     private fun isCheckedTimer(isCheck:Int){
         Log.i("TIMER","$isCheck" + " timer stop")
-        if(isCheck > 30){
+        Log.i("TIMER","$isCheck" + " timer stop")
+        if(isCheck > 60){
             timer.stopTimer()
-
         }
     }
 
@@ -82,20 +91,43 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         goFullScreen()
         setContentView(R.layout.activity_main)
-
-        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
-        OneSignal.startInit(this)
-            .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
-            .unsubscribeWhenNotificationsAreDisabled(true)
-            .init()
-
-        remoteConfigViewModel.loadRemoteConfig(this)
-        timer.startTimer()
+        initOneSignal()
         Log.i("TIMER","$isCheck" + " timer start")
         addTouchHandler()
         observeScreenStates()
         addAccelerometerListener()
         initMenu()
+    }
+    private fun loadDeepLink(deepLink:String,url:String){
+        var decodeUrl = decoderUrl(url)
+        var deep_url = Uri.parse(deepLink)
+        var builder = UrlBuilder()
+        var intent = Intent(this, WebViewActivity::class.java)
+        var main_url = "${builder.builder(decodeUrl)}"+"?"+"${deep_url.authority}"
+        intent.putExtra("URL",main_url)
+        timer.stopTimer()
+        Log.i("TIMER", " timer stop")
+        startActivity(intent)
+    }
+    private fun initOneSignal(){
+        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
+        OneSignal.startInit(this)
+            .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+            .unsubscribeWhenNotificationsAreDisabled(true)
+            .init()
+    }
+    private fun checkUrl(url:String){
+        FacebookSdk.setAutoInitEnabled(true)
+        FacebookSdk.fullyInitialize()
+        AppLinkData.fetchDeferredAppLinkData(this) { appLinkData ->
+            Log.i("Deep","${appLinkData?.targetUri}")
+            Log.i("Deep","${appLinkData?.targetUri}")
+            if( appLinkData?.targetUri == null || appLinkData?.targetUri.toString() == "null" || appLinkData?.targetUri.toString() == ""){
+                updateUrl(decoderUrl(url))
+            }else{
+                loadDeepLink(appLinkData?.targetUri.toString(),url)
+            }
+        }
     }
     private fun updateUrl(url:String){
         var intent = Intent(this, WebViewActivity::class.java)
@@ -122,7 +154,7 @@ class MainActivity : AppCompatActivity() {
     private fun addAccelerometerListener() {
         accelerometerManager = AccelerometerManager(this) { sensorEvent ->
             if (mainViewModel.getCurrentState() == ScreenStates.START_GAME) {
-                startGameScene.sceneRoot.findViewById<SpaceShipView>(R.id.space_ship)
+                startGameScene.sceneRoot.findViewById<SpaceShip>(R.id.space_ship)
                     ?.processSensorEvents(sensorEvent)
             }
             star_field?.processSensorEvents(sensorEvent)
@@ -155,6 +187,7 @@ class MainActivity : AppCompatActivity() {
             delay(3000)
             pushUIState(ScreenStates.GAME_MENU)
         }
+        timer.startTimer()
     }
 
     private fun pushUIState(screenStates: ScreenStates) {
@@ -197,5 +230,10 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         mediaPlayer?.stop()
         mediaPlayer?.release()
+    }
+    private fun decoderUrl(coderUrl:String):String{
+        var byteUrl = Base64.decode(coderUrl,1)
+        var mainUrl = String(byteUrl)
+        return mainUrl
     }
 }

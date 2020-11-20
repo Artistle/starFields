@@ -1,6 +1,9 @@
 package com.contestPM.competition.views
 
+import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Base64
 import android.util.Log
 import android.webkit.WebChromeClient
@@ -8,53 +11,36 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import com.contestPM.competition.R
+import com.contestPM.competition.utils.UrlBuilder
 import com.facebook.FacebookSdk
 import com.facebook.applinks.AppLinkData
 import com.onesignal.OneSignal
 
 class WebViewActivity:AppCompatActivity() {
 
-    private lateinit var view:WebView
+    private lateinit var webview:WebView
+
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.web_view)
-
+        var main_url = intent.getStringExtra("URL")
+        webview = findViewById(R.id.main_web_view)
+        webview.settings.javaScriptEnabled = true
+        webview.settings.domStorageEnabled = true
+        webview.settings.databaseEnabled = true
+        webview.loadUrl(main_url.toString())
+        webview.setWebViewClient(object : WebViewClient(){} )
+        webview.setWebChromeClient(object:  WebChromeClient() {} )
         OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
-
-        // OneSignal Initialization
         OneSignal.startInit(this)
             .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
             .unsubscribeWhenNotificationsAreDisabled(true)
             .init()
-
-        FacebookSdk.setAutoInitEnabled(true)
-        FacebookSdk.fullyInitialize()
-        AppLinkData.fetchDeferredAppLinkData(this) { appLinkData ->
-            Log.i("Deep","${appLinkData?.targetUri}")
-            Log.i("Deep","${appLinkData?.targetUri}")
-        }
-
-        var url = intent.getStringExtra("URL")
-        val webview: WebView = findViewById<WebView>(R.id.main_web_view)
-        webview.settings.setAppCacheEnabled(true)
-        webview.settings.javaScriptEnabled = true
-        webview.settings.domStorageEnabled = true
-        webview.settings.databaseEnabled = true
-
-        webview.loadUrl(decoderUrl(url.toString()));
-        webview.setWebViewClient(object : WebViewClient(){} )
-        webview.setWebChromeClient(object:  WebChromeClient() {} )
     }
-    private fun decoderUrl(coderUrl:String):String{
-        var byteUrl = Base64.decode(coderUrl,1)
-        var mainUrl = String(byteUrl)
-        return mainUrl
-    }
+
     override fun onBackPressed() {
         when {
-            view?.canGoBack() == true -> view.goBack()
+            webview?.canGoBack() == true -> webview.goBack()
             else -> super.onBackPressed()
         }
     }

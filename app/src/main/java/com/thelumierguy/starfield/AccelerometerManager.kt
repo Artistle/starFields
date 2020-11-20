@@ -34,7 +34,6 @@ class AccelerometerManager(context: Context, onUpdateCallBack: (SensorEvent) -> 
             gyroscopeSensor, SensorManager.SENSOR_DELAY_GAME
         )
     }
-
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun stopListening() {
         sensorManager.unregisterListener(gyroscopeSensorListener)
